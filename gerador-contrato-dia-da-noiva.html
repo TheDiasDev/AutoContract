@@ -1,0 +1,798 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gerador de Contrato — Dia da Noiva</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#FBF6EF;
+  --bg:#F2E9E1;
+  --ink:#2E2A2C;
+  --ink-soft:#867A7E;
+  --plum:#4A2B3A;
+  --rose:#C98A99;
+  --gold:#B8915C;
+  --line:#E3D6CB;
+  --card:#FFFFFF;
+  --error:#B3493F;
+}
+*{box-sizing:border-box;}
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--ink);
+  font-family:'Inter',sans-serif;
+  -webkit-font-smoothing:antialiased;
+}
+.page{max-width:860px;margin:0 auto;padding:44px 22px 100px;}
+
+/* masthead */
+.masthead{text-align:center;margin-bottom:4px;}
+.eyebrow{font-size:11px;letter-spacing:.28em;text-transform:uppercase;color:var(--gold);font-weight:700;}
+.masthead h1{font-family:'Cormorant Garamond',serif;font-weight:600;font-size:clamp(28px,5vw,42px);margin:10px 0 6px;color:var(--plum);}
+.masthead p{color:var(--ink-soft);font-size:14px;margin:0 0 22px;max-width:480px;margin-left:auto;margin-right:auto;}
+.flourish{display:block;width:170px;height:16px;margin:0 auto 30px;color:var(--rose);}
+
+/* form sections */
+.field-group{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:28px 28px 8px;margin-bottom:20px;}
+.group-label{display:flex;align-items:baseline;gap:14px;margin-bottom:18px;}
+.group-label .num{font-family:'Cormorant Garamond',serif;font-size:30px;font-weight:600;color:var(--rose);line-height:1;}
+.group-label h2{font-family:'Cormorant Garamond',serif;font-size:21px;margin:0;color:var(--plum);font-weight:600;letter-spacing:.01em;}
+.group-sub{font-size:12.5px;color:var(--ink-soft);margin:-12px 0 18px 44px;}
+
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+.field{margin-bottom:18px;}
+.field label{display:block;font-size:12.5px;font-weight:600;color:var(--plum);margin-bottom:6px;letter-spacing:.01em;}
+.field .hint{font-size:11.5px;color:var(--ink-soft);margin-top:5px;line-height:1.4;}
+input,select,textarea{
+  width:100%;
+  font-family:'Inter',sans-serif;
+  font-size:14.5px;
+  padding:11px 13px;
+  border:1px solid var(--line);
+  border-radius:8px;
+  background:#FFFDFB;
+  color:var(--ink);
+  transition:border-color .15s, box-shadow .15s;
+}
+input:focus,select:focus,textarea:focus{
+  outline:none;border-color:var(--rose);box-shadow:0 0 0 3px rgba(201,138,153,.18);
+}
+textarea{min-height:140px;resize:vertical;line-height:1.55;}
+.money-wrap{position:relative;}
+.money-wrap span{position:absolute;left:13px;top:50%;transform:translateY(-50%);color:var(--ink-soft);font-size:14.5px;pointer-events:none;}
+.money-wrap input{padding-left:38px;}
+
+.error-box{
+  display:none;background:#FBEBE9;border:1px solid #E7BDB7;color:var(--error);
+  border-radius:8px;padding:12px 16px;font-size:13.5px;margin:0 0 18px;
+}
+.error-box.visible{display:block;}
+
+/* actions */
+.actions{display:flex;justify-content:flex-end;margin-top:12px;}
+.btn{
+  font-family:'Inter',sans-serif;font-weight:600;font-size:14px;letter-spacing:.01em;
+  padding:13px 30px;border-radius:999px;border:1px solid transparent;cursor:pointer;
+  transition:transform .12s, box-shadow .12s, background .15s;
+}
+.btn-primary{background:var(--plum);color:var(--paper);}
+.btn-primary:hover{background:#3A2130;box-shadow:0 4px 14px rgba(74,43,58,.25);transform:translateY(-1px);}
+.btn-ghost{background:transparent;color:var(--plum);border-color:var(--line);}
+.btn-ghost:hover{border-color:var(--rose);}
+
+/* preview view */
+#preview-view{display:none;}
+.document-toolbar{
+  display:flex;justify-content:space-between;align-items:center;
+  margin-bottom:18px;gap:12px;flex-wrap:wrap;
+}
+.document-toolbar .note{font-size:12.5px;color:var(--ink-soft);}
+
+.paper{
+  background:var(--paper);
+  border:1px solid var(--line);
+  border-radius:4px;
+  box-shadow:0 18px 50px rgba(74,43,58,.14);
+  padding:56px 58px;
+  font-family:'Cormorant Garamond',serif;
+  color:var(--ink);
+  font-size:16.5px;
+  line-height:1.7;
+}
+.doc-title{text-align:center;font-size:24px;font-weight:600;letter-spacing:.04em;margin:0 0 6px;color:var(--plum);}
+.doc-subtitle{text-align:center;font-style:italic;color:var(--ink-soft);margin:0 0 28px;font-size:15px;}
+.doc-heading{font-size:17px;font-weight:600;color:var(--plum);margin:26px 0 10px;letter-spacing:.03em;}
+.doc-p{text-align:justify;margin:0 0 12px;}
+.doc-center{text-align:center;margin:24px 0;}
+.doc-list{margin:0 0 14px;padding-left:30px;}
+.doc-list li{margin-bottom:6px;}
+.doc-signature{text-align:center;margin-top:46px;}
+.sig-line{width:280px;border-bottom:1px solid var(--ink);margin:0 auto 8px;}
+.sig-role{font-weight:600;margin:0;}
+.sig-name{margin:2px 0 0;}
+
+@media (max-width:640px){
+  .field-row{grid-template-columns:1fr;}
+  .group-sub{margin-left:0;}
+  .paper{padding:34px 22px;font-size:15.5px;}
+  .field-group{padding:22px 18px 4px;}
+}
+</style>
+</head>
+<body>
+<div class="page">
+
+  <header class="masthead">
+    <div class="eyebrow">Studio LR Makeup &amp; Beauty</div>
+    <h1>Gerador de Contrato — Dia da Noiva</h1>
+    <p>Preencha os dados desta noiva e do atendimento. O restante do contrato é montado automaticamente.</p>
+  </header>
+  <svg class="flourish" viewBox="0 0 200 20" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <line x1="0" y1="10" x2="84" y2="10" stroke="currentColor" stroke-width="1"/>
+    <path d="M100 3 L107 10 L100 17 L93 10 Z" fill="currentColor"/>
+    <line x1="116" y1="10" x2="200" y2="10" stroke="currentColor" stroke-width="1"/>
+  </svg>
+
+  <!-- ============ FORM VIEW ============ -->
+  <main id="form-view">
+    <div class="error-box" id="error-box"></div>
+    <form id="contract-form">
+
+      <section class="field-group">
+        <div class="group-label"><span class="num">01</span><h2>Dados da contratante</h2></div>
+        <div class="group-sub">Informações da noiva, conforme documento.</div>
+
+        <div class="field">
+          <label for="f-nome">Nome completo *</label>
+          <input type="text" id="f-nome" placeholder="Ex.: Joyce Alves da Silva" required>
+        </div>
+
+        <div class="field-row">
+          <div class="field">
+            <label for="f-cpf">CPF (opcional)</label>
+            <input type="text" id="f-cpf" placeholder="000.000.000-00" inputmode="numeric">
+          </div>
+          <div class="field">
+            <label for="f-rg">RG (opcional)</label>
+            <input type="text" id="f-rg" placeholder="00.000.000-0" inputmode="numeric">
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="f-endereco">Endereço completo *</label>
+          <input type="text" id="f-endereco" placeholder="Rua, número, bairro, cidade/UF" required>
+        </div>
+      </section>
+
+      <section class="field-group">
+        <div class="group-label"><span class="num">02</span><h2>Evento</h2></div>
+        <div class="group-sub">Data, horário e local do Dia da Noiva.</div>
+
+        <div class="field-row">
+          <div class="field">
+            <label for="f-data-evento">Data do evento *</label>
+            <input type="date" id="f-data-evento" required>
+          </div>
+          <div class="field">
+            <label for="f-horario">Horário previsto *</label>
+            <input type="time" id="f-horario" value="12:00" required>
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="f-local-tipo">Local do atendimento</label>
+          <select id="f-local-tipo">
+            <option value="studio" selected>Studio LR Makeup &amp; Beauty (Mogi das Cruzes/SP)</option>
+            <option value="custom">Atendimento externo (informar endereço)</option>
+          </select>
+        </div>
+
+        <div class="field" id="campo-local-custom" style="display:none;">
+          <label for="f-local-custom">Endereço do atendimento externo</label>
+          <input type="text" id="f-local-custom" placeholder="Endereço completo do local do evento">
+          <div class="hint">O deslocamento até este endereço pode gerar custo adicional, conforme a Cláusula 3ª.</div>
+        </div>
+      </section>
+
+      <section class="field-group">
+        <div class="group-label"><span class="num">03</span><h2>Pacote &amp; valores</h2></div>
+        <div class="group-sub">Serviços inclusos e condições de pagamento.</div>
+
+        <div class="field">
+          <label for="f-pacote-nome">Nome do pacote *</label>
+          <input type="text" id="f-pacote-nome" value="Diamante" required>
+        </div>
+
+        <div class="field">
+          <label for="f-pacote-servicos">Serviços inclusos (um por linha) *</label>
+          <textarea id="f-pacote-servicos" required></textarea>
+          <div class="hint">Edite, adicione ou remova linhas para montar o pacote desta cliente.</div>
+        </div>
+
+        <div class="field-row">
+          <div class="field">
+            <label for="f-valor-total">Valor total do pacote (R$) *</label>
+            <div class="money-wrap"><span>R$</span><input type="text" id="f-valor-total" inputmode="decimal" placeholder="2660,00" required></div>
+          </div>
+          <div class="field">
+            <label for="f-valor-entrada">Valor da entrada / sinal (R$)</label>
+            <div class="money-wrap"><span>R$</span><input type="text" id="f-valor-entrada" inputmode="decimal" placeholder="399,00"></div>
+            <div class="hint">Sugestão automática de 15% do valor total. Pode ser ajustado.</div>
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="f-forma-pagamento">Observações sobre forma de pagamento (opcional)</label>
+          <input type="text" id="f-forma-pagamento" placeholder="Ex.: parcelamento em até 3x no cartão, taxa por conta da contratante">
+          <div class="hint">As informações de PIX da CONTRATADA já constam automaticamente no contrato.</div>
+        </div>
+      </section>
+
+      <section class="field-group">
+        <div class="group-label"><span class="num">04</span><h2>Observações &amp; assinatura</h2></div>
+        <div class="group-sub">Detalhes finais antes de gerar o documento.</div>
+
+        <div class="field">
+          <label for="f-observacoes">Observações adicionais (opcional)</label>
+          <textarea id="f-observacoes" placeholder="Qualquer combinação extra entre as partes que deva constar no contrato."></textarea>
+        </div>
+
+        <div class="field">
+          <label for="f-data-contrato">Data deste contrato *</label>
+          <input type="date" id="f-data-contrato" required>
+        </div>
+      </section>
+
+      <div class="actions">
+        <button type="button" class="btn btn-primary" id="btn-preview">Gerar contrato</button>
+      </div>
+    </form>
+  </main>
+
+  <!-- ============ PREVIEW VIEW ============ -->
+  <main id="preview-view">
+    <div class="document-toolbar">
+      <button type="button" class="btn btn-ghost" id="btn-edit">← Editar</button>
+      <span class="note">Revise o contrato antes de gerar o PDF.</span>
+      <button type="button" class="btn btn-primary" id="btn-pdf">Confirmar e gerar PDF</button>
+    </div>
+    <div class="paper" id="contract-paper"></div>
+    <div class="actions" style="justify-content:space-between;margin-top:18px;">
+      <button type="button" class="btn btn-ghost" id="btn-edit-2">← Editar</button>
+      <button type="button" class="btn btn-primary" id="btn-pdf-2">Confirmar e gerar PDF</button>
+    </div>
+  </main>
+
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script>
+/* ============================================================
+   DADOS FIXOS DA CONTRATADA (Studio LR Makeup & Beauty)
+   ============================================================ */
+const CONTRATADA = {
+  nome: 'Letícia Rodrigues de Aguiar',
+  rg: '39.312.993-7',
+  cnpj: '50.248.751/0001-08',
+  endereco: 'Rua Cruzeiro do Sul, 411 (sala 2), Vila Oliveira, Mogi das Cruzes/SP',
+  pixChave: '435.037.678-00',
+  pixTitular: 'Letícia Rodrigues de Aguiar — Banco Mercado Pago',
+  telefone: '(11) 99395-3489',
+  foro: 'Mogi das Cruzes, Estado de São Paulo'
+};
+
+const PACOTE_DIAMANTE = [
+  'Atendimento principal no local do evento',
+  'Maquiagem completa com preparação de pele',
+  'Massagem facial com pedra de quartzo',
+  'Pele resistente de alta durabilidade',
+  'Penteado completo para noiva',
+  'Dia de prévia de maquiagem e penteado',
+  'Robe branco "Noiva" (devolução após o uso)',
+  'Caixinha da noiva',
+  'Reunião de alinhamento',
+  'Exclusividade do atendimento',
+  'Assistência para a noiva no momento de vestir e fixar acessórios'
+].join('\n');
+
+/* ============================================================
+   UTILITÁRIOS
+   ============================================================ */
+function parseMoney(v){
+  if (!v) return 0;
+  v = v.toString().trim().replace(/[^\d,.\-]/g,'');
+  if (v.includes(',') && v.includes('.')) {
+    if (v.lastIndexOf(',') > v.lastIndexOf('.')) v = v.replace(/\./g,'').replace(',', '.');
+    else v = v.replace(/,/g,'');
+  } else if (v.includes(',')) {
+    v = v.replace(',', '.');
+  }
+  const n = parseFloat(v);
+  return isNaN(n) ? 0 : n;
+}
+
+function formatBRL(v){
+  return 'R$ ' + v.toLocaleString('pt-BR', {minimumFractionDigits:2, maximumFractionDigits:2});
+}
+
+function extenso(valor){
+  valor = Math.round(valor * 100) / 100;
+  const inteiro = Math.floor(valor);
+  const centavos = Math.round((valor - inteiro) * 100);
+
+  const unidades = ['','um','dois','três','quatro','cinco','seis','sete','oito','nove'];
+  const dez19 = ['dez','onze','doze','treze','quatorze','quinze','dezesseis','dezessete','dezoito','dezenove'];
+  const dezenas = ['','','vinte','trinta','quarenta','cinquenta','sessenta','setenta','oitenta','noventa'];
+  const centenas = ['','cento','duzentos','trezentos','quatrocentos','quinhentos','seiscentos','setecentos','oitocentos','novecentos'];
+
+  function tresDigitos(n){
+    if (n === 0) return '';
+    if (n === 100) return 'cem';
+    const c = Math.floor(n/100), r = n % 100;
+    const parts = [];
+    if (c > 0) parts.push(centenas[c]);
+    if (r > 0){
+      if (r < 10) parts.push(unidades[r]);
+      else if (r < 20) parts.push(dez19[r-10]);
+      else {
+        const d = Math.floor(r/10), u = r % 10;
+        parts.push(u === 0 ? dezenas[d] : (dezenas[d] + ' e ' + unidades[u]));
+      }
+    }
+    return parts.join(' e ');
+  }
+
+  let extensoInteiro;
+  if (inteiro === 0) {
+    extensoInteiro = 'zero';
+  } else {
+    const escalaSing = ['', 'mil', 'milhão', 'bilhão'];
+    const escalaPlur = ['', 'mil', 'milhões', 'bilhões'];
+    const grupos = [];
+    let n = inteiro;
+    while (n > 0){ grupos.push(n % 1000); n = Math.floor(n/1000); }
+
+    const partes = [];
+    for (let idx = grupos.length - 1; idx >= 0; idx--){
+      const g = grupos[idx];
+      if (g === 0) continue;
+      let txt = tresDigitos(g);
+      if (idx === 1) txt = (g === 1) ? 'mil' : (txt + ' mil');
+      else if (idx >= 2) txt = txt + ' ' + (g === 1 ? escalaSing[idx] : escalaPlur[idx]);
+      partes.push(txt);
+    }
+
+    if (partes.length === 1) extensoInteiro = partes[0];
+    else {
+      const last = partes.pop();
+      extensoInteiro = partes.join(', ') + ' e ' + last;
+    }
+  }
+
+  // "de reais" quando o valor é um múltiplo "puro" de milhão/bilhão (ex.: "um milhão de reais")
+  let precisaDe = false;
+  if (inteiro >= 1000000){
+    const grupos2 = [];
+    let n2 = inteiro;
+    while (n2 > 0){ grupos2.push(n2 % 1000); n2 = Math.floor(n2/1000); }
+    precisaDe = grupos2[0] === 0 && (grupos2[1] === undefined || grupos2[1] === 0);
+  }
+
+  let resultado = extensoInteiro + (precisaDe ? ' de' : '') + (inteiro === 1 ? ' real' : ' reais');
+  if (centavos > 0){
+    const extensoCent = tresDigitos(centavos);
+    resultado += ' e ' + extensoCent + (centavos === 1 ? ' centavo' : ' centavos');
+  }
+  return resultado;
+}
+
+function formatarData(dataStr){
+  if (!dataStr) return '';
+  const [ano, mes, dia] = dataStr.split('-');
+  const meses = ['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];
+  return `${parseInt(dia,10)} de ${meses[parseInt(mes,10)-1]} de ${ano}`;
+}
+
+function slugify(s){
+  return (s || 'cliente')
+    .normalize('NFD').replace(/[\u0300-\u036f]/g,'')
+    .replace(/[^a-zA-Z0-9]+/g,'_')
+    .replace(/^_+|_+$/g,'') || 'cliente';
+}
+
+function escapeHtml(s){
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+/* ============================================================
+   MONTAGEM DO CONTRATO (estrutura única usada na tela e no PDF)
+   ============================================================ */
+function buildContractParagraphs(data){
+  const P = [];
+  const add = (type, runs, extra) => P.push(Object.assign({type, runs: runs || []}, extra || {}));
+
+  add('title', [{text:'CONTRATO DE PRESTAÇÃO DE SERVIÇOS — DIA DA NOIVA', bold:true}]);
+  add('subtitle', [{text:'Serviços de cabelo e maquiagem para noiva', italic:true}]);
+
+  let docTxt = '';
+  if (data.cpf && data.rg) docTxt = `portadora do CPF nº ${data.cpf} e do RG nº ${data.rg}, `;
+  else if (data.cpf) docTxt = `portadora do CPF nº ${data.cpf}, `;
+  else if (data.rg) docTxt = `portadora do RG nº ${data.rg}, `;
+
+  add('p', [
+    {text:'De um lado, '},
+    {text:data.nome, bold:true},
+    {text:`, brasileira, ${docTxt}residente e domiciliada em ${data.endereco}, doravante denominada `},
+    {text:'CONTRATANTE', bold:true},
+    {text:'.'}
+  ]);
+
+  add('p', [
+    {text:'De outro lado, '},
+    {text:CONTRATADA.nome, bold:true},
+    {text:`, brasileira, maquiadora, portadora da Cédula de Identidade RG nº ${CONTRATADA.rg} e CNPJ nº ${CONTRATADA.cnpj}, com sala comercial localizada na ${CONTRATADA.endereco}, doravante denominada `},
+    {text:'CONTRATADA', bold:true},
+    {text:'.'}
+  ]);
+
+  add('p', [
+    {text:'As partes acima identificadas têm, entre si, justo e acertado o presente '},
+    {text:'CONTRATO DE PRESTAÇÃO DE SERVIÇOS DE CABELO E MAQUIAGEM PARA DIA DA NOIVA', bold:true},
+    {text:', que se regerá pelas cláusulas e condições de preço, forma e prazo de pagamento descritas a seguir.'}
+  ]);
+
+  // CLÁUSULA 1
+  add('heading', [{text:'CLÁUSULA 1ª — DO OBJETO', bold:true}]);
+  add('p', [{text:'A CONTRATADA obriga-se a prestar seus serviços profissionais na realização de penteado e maquiagem para noiva, a serem desenvolvidos de acordo com as especificações deste contrato.'}]);
+  add('p', [{text:'Parágrafo primeiro. ', bold:true}, {text:'Não será permitida a substituição da profissional responsável pela execução dos serviços contratados por outra profissional não prevista neste pacote.'}]);
+  add('p', [{text:'Parágrafo segundo. ', bold:true}, {text:'Os materiais e ferramentas necessários à realização dos serviços serão fornecidos única e exclusivamente pela CONTRATADA.'}]);
+
+  // CLÁUSULA 2
+  add('heading', [{text:'CLÁUSULA 2ª — DOS SERVIÇOS CONTRATADOS E DO VALOR', bold:true}]);
+  add('p', [
+    {text:'Parágrafo primeiro. ', bold:true},
+    {text:'Caberá à CONTRATADA a execução dos seguintes serviços, integrantes do '},
+    {text:`Pacote ${data.pacoteNome}`, bold:true},
+    {text:':'}
+  ]);
+  data.servicos.forEach(item => add('list-item', [{text:item}]));
+
+  const valorTotal = data.valorTotal;
+  const valorEntrada = data.valorEntrada;
+  const valorSaldo = Math.max(valorTotal - valorEntrada, 0);
+
+  add('p', [{text:'Parágrafo segundo. ', bold:true}, {text:`O valor total do pacote contratado é de ${formatBRL(valorTotal)} (${extenso(valorTotal)}).`}]);
+  add('p', [{text:`Para a reserva da data, é necessária a assinatura deste contrato e o pagamento de uma entrada (sinal) no valor de ${formatBRL(valorEntrada)} (${extenso(valorEntrada)}), a ser realizado no ato da assinatura deste documento.`}]);
+  add('p', [{text:`O saldo remanescente, de ${formatBRL(valorSaldo)} (${extenso(valorSaldo)}), deverá ser quitado integralmente até 2 (dois) dias antes da realização do evento.`}]);
+
+  add('p', [
+    {text:'Parágrafo terceiro. ', bold:true},
+    {text:`Os pagamentos deverão ser realizados via PIX, chave CPF nº ${CONTRATADA.pixChave} (${CONTRATADA.pixTitular}), com envio do comprovante para o telefone responsável pelo Studio: ${CONTRATADA.telefone}.`}
+  ]);
+  if (data.formaPagamento) add('p', [{text:data.formaPagamento}]);
+  add('p', [{text:'Em caso de pagamento via cartão de crédito, serão consideradas as taxas da operadora e os juros de parcelamento, podendo os valores ser simulados previamente.', italic:true}]);
+
+  add('p', [{text:'Parágrafo quarto. ', bold:true}, {text:'Acessórios e/ou enfeites para o cabelo da CONTRATANTE não estão incluídos no pacote contratado.'}]);
+
+  // CLÁUSULA 3
+  add('heading', [{text:'CLÁUSULA 3ª — DO LOCAL, DATA E HORÁRIO', bold:true}]);
+  add('p', [{text:`O evento será realizado em ${formatarData(data.dataEvento)}, com início do atendimento previsto para as ${data.horario}.`}]);
+
+  const localTexto = data.localTipo === 'custom'
+    ? data.localCustom
+    : `Studio LR Makeup & Beauty (${CONTRATADA.endereco})`;
+  add('p', [{text:`O atendimento do "Dia da Noiva" ocorrerá em ${localTexto}, podendo o local ser alterado a critério da CONTRATANTE, mediante cobrança adicional pelo deslocamento.`}]);
+
+  add('p', [
+    {text:'Parágrafo primeiro. ', bold:true},
+    {text:`O serviço de prévia (teste de maquiagem e penteado) será realizado no Studio Letícia Rodrigues Makeup & Beauty, na ${CONTRATADA.endereco}, com agendamento entre 15 e 20 dias antes do evento, em dias úteis de segunda a quinta-feira, em data e horário a combinar entre as partes. `},
+    {text:'A maquiagem e o penteado definidos na prévia não poderão ser alterados posteriormente. ', bold:true},
+    {text:'Caso a CONTRATANTE opte por alterações após a prévia, será realizado novo teste, mediante cobrança de R$ 260,00 por procedimento.'}
+  ]);
+  add('p', [{text:'Parágrafo segundo. ', bold:true}, {text:'Um cronograma do atendimento do Dia da Noiva será enviado à CONTRATANTE com até 7 (sete) dias de antecedência do evento, para organização de horários, making of e demais protocolos.'}]);
+  add('p', [
+    {text:'Parágrafo terceiro. ', bold:true},
+    {text:'No dia do evento, a tolerância máxima de atraso para o início do atendimento é de 30 (trinta) minutos. '},
+    {text:'Após esse prazo, será cobrada multa de R$ 100,00 por hora de atraso.', bold:true}
+  ]);
+  add('p', [{text:'Parágrafo quarto. ', bold:true}, {text:'Em caso de atraso no horário inicial por parte da CONTRATANTE, a CONTRATADA não se responsabiliza pela conclusão dos serviços no horário previsto em cronograma.'}]);
+  add('p', [{text:'Parágrafo quinto. ', bold:true}, {text:'Em atendimentos externos, a CONTRATANTE deverá providenciar um local iluminado e com mesa disponível para a organização dos materiais, de modo a garantir a realização adequada dos serviços.'}]);
+
+  // CLÁUSULA 4
+  add('heading', [{text:'CLÁUSULA 4ª — DOS CANCELAMENTOS', bold:true}]);
+  add('p', [{text:'Parágrafo primeiro. ', bold:true}, {text:'Em casos fortuitos ou de força maior (acidente, doença grave, falecimento de familiar ou outros), caso a CONTRATADA não possa prestar os serviços, deverá comunicar a CONTRATANTE com até 7 (sete) dias de antecedência do evento e providenciar profissional substituta, exclusivamente nessas hipóteses.'}]);
+  add('p', [{text:'Parágrafo segundo. ', bold:true}, {text:'Em caso de desistência por parte da CONTRATANTE, o cancelamento deverá ser solicitado por escrito à CONTRATADA. Após 7 (sete) dias corridos da contratação, em caso de desistência, a CONTRATANTE estará sujeita à multa de 30% (trinta por cento) sobre o valor do pacote contratado, além da perda do valor de entrada já pago, a título de cobertura dos prejuízos pela reserva da data.'}]);
+  add('p', [{text:'Parágrafo terceiro. ', bold:true}, {text:'O valor de entrada pago no ato deste contrato somente será restituído caso a solicitação seja feita por escrito, com assinatura da CONTRATANTE, dentro do prazo de 7 (sete) dias corridos a contar da data deste documento.'}]);
+  add('p', [{text:'Após o prazo de 7 (sete) dias corridos, não será restituído, sob nenhuma hipótese, o valor pago no ato deste contrato.', bold:true}]);
+
+  // CLÁUSULA 5
+  add('heading', [{text:'CLÁUSULA 5ª — DO FORO', bold:true}]);
+  add('p', [{text:`Para dirimir quaisquer controvérsias decorrentes deste contrato, as partes elegem o foro da comarca de ${CONTRATADA.foro}.`}]);
+
+  // CLÁUSULA 6
+  add('heading', [{text:'CLÁUSULA 6ª — DAS DISPOSIÇÕES FINAIS', bold:true}]);
+  add('p', [{text:'Por estarem assim justas e contratadas, as partes firmam o presente instrumento em duas vias de igual teor.'}]);
+
+  if (data.observacoes){
+    add('heading', [{text:'OBSERVAÇÕES ADICIONAIS', bold:true}]);
+    add('p', [{text:data.observacoes}]);
+  }
+
+  add('center', [{text:`Mogi das Cruzes, ${formatarData(data.dataContrato)}.`}]);
+
+  add('signature', [], {role:'CONTRATADA', name:CONTRATADA.nome});
+  add('signature', [], {role:'CONTRATANTE', name:data.nome});
+
+  return P;
+}
+
+/* ============================================================
+   RENDERIZAÇÃO NA TELA (preview)
+   ============================================================ */
+function runsToHtml(runs){
+  return runs.map(r => {
+    let t = escapeHtml(r.text);
+    if (r.bold) t = `<strong>${t}</strong>`;
+    if (r.italic) t = `<em>${t}</em>`;
+    return t;
+  }).join('');
+}
+
+function renderPreview(paragraphs){
+  let html = '';
+  let listBuffer = [];
+  const flushList = () => {
+    if (listBuffer.length){
+      html += `<ul class="doc-list">${listBuffer.map(li => `<li>${runsToHtml(li)}</li>`).join('')}</ul>`;
+      listBuffer = [];
+    }
+  };
+  paragraphs.forEach(p => {
+    if (p.type === 'list-item'){ listBuffer.push(p.runs); return; }
+    flushList();
+    switch(p.type){
+      case 'title': html += `<h1 class="doc-title">${runsToHtml(p.runs)}</h1>`; break;
+      case 'subtitle': html += `<p class="doc-subtitle">${runsToHtml(p.runs)}</p>`; break;
+      case 'heading': html += `<h2 class="doc-heading">${runsToHtml(p.runs)}</h2>`; break;
+      case 'center': html += `<p class="doc-center">${runsToHtml(p.runs)}</p>`; break;
+      case 'signature':
+        html += `<div class="doc-signature"><div class="sig-line"></div><p class="sig-role">(${escapeHtml(p.role)})</p><p class="sig-name">${escapeHtml(p.name)}</p></div>`;
+        break;
+      default: html += `<p class="doc-p">${runsToHtml(p.runs)}</p>`;
+    }
+  });
+  flushList();
+  return html;
+}
+
+/* ============================================================
+   GERAÇÃO DO PDF (jsPDF)
+   ============================================================ */
+function writeRuns(doc, runs, x, y, maxWidth, opts){
+  const fontSize = opts.fontSize;
+  const lineHeight = opts.lineHeight;
+  const align = opts.align || 'left';
+  const pageHeight = 297, marginTop = 22, marginBottom = 22;
+  doc.setFontSize(fontSize);
+
+  let tokens = [];
+  runs.forEach(run => {
+    run.text.split(/(\s+)/).filter(s => s.length > 0).forEach(t => {
+      tokens.push({text:t, bold:!!run.bold, italic:!!run.italic});
+    });
+  });
+
+  const widthOf = (t) => {
+    doc.setFont('times', t.bold ? 'bold' : (t.italic ? 'italic' : 'normal'));
+    return doc.getTextWidth(t.text);
+  };
+
+  const lines = [];
+  let cur = [], curW = 0;
+  tokens.forEach(tok => {
+    const w = widthOf(tok);
+    const isSpace = tok.text.trim() === '';
+    if (curW + w > maxWidth && cur.length > 0 && !isSpace){
+      while (cur.length && cur[cur.length-1].text.trim() === '') cur.pop();
+      lines.push(cur);
+      cur = [tok]; curW = w;
+    } else {
+      if (isSpace && cur.length === 0) { /* skip leading space */ }
+      else { cur.push(tok); curW += w; }
+    }
+  });
+  if (cur.length){
+    while (cur.length && cur[cur.length-1].text.trim() === '') cur.pop();
+    lines.push(cur);
+  }
+
+  let bulletDrawn = false;
+  lines.forEach((line, idx) => {
+    if (y + lineHeight > pageHeight - marginBottom){ doc.addPage(); y = marginTop; }
+    if (opts.bullet && !bulletDrawn){
+      doc.setFont('times','normal'); doc.setFontSize(fontSize);
+      doc.text('•', opts.bulletX != null ? opts.bulletX : x - 6, y);
+      bulletDrawn = true;
+    }
+    const lineWidth = line.reduce((s,t) => s + widthOf(t), 0);
+    let startX = x;
+    if (align === 'center') startX = x + (maxWidth - lineWidth) / 2;
+    else if (align === 'right') startX = x + (maxWidth - lineWidth);
+    let cx = startX;
+    const isLast = idx === lines.length - 1;
+    if (align === 'justify' && !isLast){
+      const spaces = line.filter(t => t.text.trim() === '');
+      const extra = Math.max(maxWidth - lineWidth, 0);
+      const extraPer = spaces.length ? extra / spaces.length : 0;
+      line.forEach(t => {
+        doc.setFont('times', t.bold ? 'bold' : (t.italic ? 'italic' : 'normal'));
+        doc.text(t.text, cx, y);
+        let w = widthOf(t);
+        if (t.text.trim() === '') w += extraPer;
+        cx += w;
+      });
+    } else {
+      line.forEach(t => {
+        doc.setFont('times', t.bold ? 'bold' : (t.italic ? 'italic' : 'normal'));
+        doc.text(t.text, cx, y);
+        cx += widthOf(t);
+      });
+    }
+    y += lineHeight;
+  });
+  return y;
+}
+
+function generatePDF(paragraphs, data){
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({unit:'mm', format:'a4'});
+  const marginLeft = 20, marginRight = 20, marginTop = 22, marginBottom = 22;
+  const pageWidth = 210, pageHeight = 297;
+  const contentWidth = pageWidth - marginLeft - marginRight;
+  let y = marginTop;
+
+  paragraphs.forEach(p => {
+    switch(p.type){
+      case 'title':
+        y = writeRuns(doc, p.runs, marginLeft, y, contentWidth, {fontSize:15, lineHeight:6.5, align:'center'});
+        break;
+      case 'subtitle':
+        y = writeRuns(doc, p.runs, marginLeft, y, contentWidth, {fontSize:11, lineHeight:5, align:'center'});
+        y += 3;
+        break;
+      case 'heading':
+        y += 3;
+        if (y + 8 > pageHeight - marginBottom){ doc.addPage(); y = marginTop; }
+        y = writeRuns(doc, p.runs, marginLeft, y, contentWidth, {fontSize:12, lineHeight:5.5, align:'left'});
+        y += 1.5;
+        break;
+      case 'list-item':
+        y = writeRuns(doc, p.runs, marginLeft + 6, y, contentWidth - 6, {fontSize:10.5, lineHeight:4.8, align:'left', bullet:true, bulletX:marginLeft});
+        y += 0.5;
+        break;
+      case 'center':
+        y += 2;
+        y = writeRuns(doc, p.runs, marginLeft, y, contentWidth, {fontSize:11, lineHeight:5, align:'center'});
+        break;
+      case 'signature':
+        y += 10;
+        if (y + 22 > pageHeight - marginBottom){ doc.addPage(); y = marginTop; }
+        doc.setLineWidth(0.2);
+        doc.line(pageWidth/2 - 40, y, pageWidth/2 + 40, y);
+        y += 5;
+        y = writeRuns(doc, [{text:`(${p.role})`, bold:true}], marginLeft, y, contentWidth, {fontSize:10.5, lineHeight:5, align:'center'});
+        y = writeRuns(doc, [{text:p.name}], marginLeft, y, contentWidth, {fontSize:10.5, lineHeight:5, align:'center'});
+        break;
+      default:
+        y = writeRuns(doc, p.runs, marginLeft, y, contentWidth, {fontSize:10.5, lineHeight:4.8, align:'justify'});
+        y += 2;
+    }
+  });
+
+  const filename = `Contrato_DiaDaNoiva_${slugify(data.nome)}_${data.dataEvento || 'data'}.pdf`;
+  doc.save(filename);
+}
+
+/* ============================================================
+   INTERAÇÃO DO FORMULÁRIO
+   ============================================================ */
+const $ = (id) => document.getElementById(id);
+
+// valores iniciais
+$('f-pacote-servicos').value = PACOTE_DIAMANTE;
+$('f-valor-total').value = '2660,00';
+$('f-valor-entrada').value = '399,00';
+$('f-data-contrato').value = new Date().toISOString().slice(0,10);
+
+let entradaManual = true; // já preenchido acima manualmente, mas mantemos auto-ajuste a partir da próxima edição do total
+
+$('f-local-tipo').addEventListener('change', (e) => {
+  $('campo-local-custom').style.display = e.target.value === 'custom' ? 'block' : 'none';
+});
+
+$('f-valor-total').addEventListener('input', () => {
+  if (!entradaManual){
+    const total = parseMoney($('f-valor-total').value);
+    $('f-valor-entrada').value = (total * 0.15).toFixed(2).replace('.', ',');
+  }
+});
+$('f-valor-entrada').addEventListener('input', () => { entradaManual = true; });
+
+function showError(msg){
+  const box = $('error-box');
+  box.textContent = msg;
+  box.classList.add('visible');
+  box.scrollIntoView({behavior:'smooth', block:'center'});
+}
+function hideError(){ $('error-box').classList.remove('visible'); }
+
+function collectData(){
+  const localTipo = $('f-local-tipo').value;
+  return {
+    nome: $('f-nome').value.trim(),
+    cpf: $('f-cpf').value.trim(),
+    rg: $('f-rg').value.trim(),
+    endereco: $('f-endereco').value.trim(),
+    dataEvento: $('f-data-evento').value,
+    horario: $('f-horario').value,
+    localTipo: localTipo,
+    localCustom: $('f-local-custom').value.trim(),
+    pacoteNome: $('f-pacote-nome').value.trim() || 'Personalizado',
+    servicos: $('f-pacote-servicos').value.split('\n').map(s => s.trim()).filter(Boolean),
+    valorTotal: parseMoney($('f-valor-total').value),
+    valorEntrada: parseMoney($('f-valor-entrada').value),
+    formaPagamento: $('f-forma-pagamento').value.trim(),
+    observacoes: $('f-observacoes').value.trim(),
+    dataContrato: $('f-data-contrato').value
+  };
+}
+
+function validate(data){
+  if (!data.nome) return 'Informe o nome completo da contratante.';
+  if (!data.endereco) return 'Informe o endereço da contratante.';
+  if (!data.dataEvento) return 'Informe a data do evento.';
+  if (!data.horario) return 'Informe o horário previsto do evento.';
+  if (data.localTipo === 'custom' && !data.localCustom) return 'Informe o endereço do atendimento externo.';
+  if (data.servicos.length === 0) return 'Informe ao menos um serviço incluso no pacote.';
+  if (!data.valorTotal || data.valorTotal <= 0) return 'Informe o valor total do pacote.';
+  if (!data.dataContrato) return 'Informe a data deste contrato.';
+  return null;
+}
+
+let currentParagraphs = null;
+let currentData = null;
+
+function goToPreview(){
+  const data = collectData();
+  const error = validate(data);
+  if (error){ showError(error); return; }
+  hideError();
+  if (!data.valorEntrada) data.valorEntrada = Math.round(data.valorTotal * 0.15 * 100) / 100;
+
+  currentData = data;
+  currentParagraphs = buildContractParagraphs(data);
+  $('contract-paper').innerHTML = renderPreview(currentParagraphs);
+  $('form-view').style.display = 'none';
+  $('preview-view').style.display = 'block';
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+function goToForm(){
+  $('preview-view').style.display = 'none';
+  $('form-view').style.display = 'block';
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+$('btn-preview').addEventListener('click', goToPreview);
+$('btn-edit').addEventListener('click', goToForm);
+$('btn-edit-2').addEventListener('click', goToForm);
+$('btn-pdf').addEventListener('click', () => generatePDF(currentParagraphs, currentData));
+$('btn-pdf-2').addEventListener('click', () => generatePDF(currentParagraphs, currentData));
+</script>
+</body>
+</html>
